@@ -1,0 +1,137 @@
+{% extends 'index.html' %}
+
+{% block title %}
+<title>Datos Estudiante</title>
+{% endblock %}
+
+{% block conted %}
+<div class="container mt-4">
+  <form id="filter-form" method="get" action="{% url 'dashboard:index' %}">
+    <div class="row g-3">
+     <div class="col-md-3">
+        <label for="programa-filter" class="form-label">Año lectivo:</label>
+        <select id="programa-filter" name="anio" class="form-select">
+            <option value="">Todos</option>
+            {% for year in schoolYear %}
+                <option value="{{ year.idScholYear }}" {% if year.idScholYear == request.GET.anio %} selected {% endif %}>
+                    {{ year.nameYear }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+      <div class="col-md-2">
+        <label for="zona-filter" class="form-label">Zona:</label>
+        <select id="zona-filter" name="zona" class="form-select">
+          <option value="">Todas</option>
+          {% for zona in zones %}
+          <option value="{{ zona.zone }}" {% if zona.zone == request.GET.zona %} selected {% endif %}>{{ zona.zone }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="region-filter" class="form-label">Regiones:</label>
+        <select id="region-filter" name="region" class="form-select">
+          <option value="">Todas</option>
+          {% for region in regiones %}
+          <option value="{{ region.region }}"  {% if region.region == request.GET.region %} selected {% endif %}>{{ region.region }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="centro-filter" class="form-label">Centro:</label>
+        <select id="centro-filter" name="centro" class="form-select">
+          <option value="">Todos</option>
+          {% for center in centerSchool %}
+          <option value="{{ center.centerSchool }}"{% if center.centerSchool == request.GET.centro %} selected {% endif %}>{{ center.centerSchool }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="programa-filter" class="form-label">Programa:</label>
+        <select id="programa-filter" name="programa" class="form-select">
+          <option value="">Todos</option>
+          {% for program in programs %}
+          <option value="{{ program.program }}" {% if program.program == request.GET.programa %} selected {% endif %}>{{ program.program }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="student-type-filter" class="form-label">Tipo estudiante:</label>
+        <select id="student-type-filter" name="student_type" class="form-select">
+          <option value="">Todos</option>
+          {% for studentType in studentTypes %}
+          <option value="{{ studentType.studentType }}" {% if studentType.studentType == request.GET.student_type %} selected {% endif %}>{{ studentType.studentType }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="modality-filter" class="form-label">Modalidad:</label>
+        <select id="modality-filter" name="modality" class="form-select">
+          <option value="">Todas</option>
+          {% for modality in modalitys %}
+          <option value="{{ modality.modality }}" {% if modality.modality == request.GET.modality %} selected {% endif %}>{{ modality.modality }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+      </div>
+    </div>
+  </form>
+
+  <table class="table table-bordered table-striped  table-responsive" id="dataTable" width="100%" cellspacing="0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Identificación</th>
+        <th>Nombres</th>
+        <th>Modalidad</th>
+        <th>Ciclo</th>
+        <th>Promedio</th>
+       
+     
+        <th>Tipo</th>
+        <th>Centro educativo</th>
+        <th>Zona</th>
+        <th>Region</th>
+        <th>Año académico</th>
+        <th class="center">Detalles</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if datastudents %}
+      {% for est in datastudents %}
+      <tr>
+        <td>{{ est.idDataStudent }}</td>
+        <td>{{ est.identification }}</td>
+        <td>{{ est.names }}</td>
+        <td>{{ est.modality }}</td>
+        <td>{{ est.cycle }}</td>
+       <td>{{ est.average_qualification|default:"N/A" }}</td>
+        
+      
+        <td>{{ est.studentType }}</td>
+        <td>{{ est.centerSchool }}</td>
+        <td>{{ est.zone }}</td>
+        <td>{{ est.region }}</td>
+        <td>{{ est.nameYear }}</td>
+        <td class="center">
+          <a class="btn btn-primary" href="{%url 'dashboard:detail_student' est.identification  est.nameYear.idScholYear %}"> <i
+              class="fa-solid fa-eye"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+      {% else %}
+      <h1>no hay registro de data</h1>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

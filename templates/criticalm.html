@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block title %}
+  <title>Dashboard</title>
+  {% endblock %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/styleb.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style_footer.css'%}">
+  <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap5.min.css'%}">
+  <link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+  <script src="https://kit.fontawesome.com/4ab2e2f761.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+    integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      {% block nav%}
+      {% include 'sibar.html'%}
+      {% endblock%}
+      <div class="col pt-3 p-0">
+        <!-- contenido de la pagina-->
+        <div class="container my-3  min-vh-100">
+          {%block conted%}
+          <h1>Gráfico Estadístico de materias criticas</h1>
+      <form id="filter-form" method="get" action="{% url 'dashboard:statistics_academic' %}">
+        <div class="row g-3">
+         <div class="col-md-3">
+            <label for="programa-filter" class="form-label">Año lectivo:</label>
+            <select id="programa-filter" name="anio" class="form-select">
+                <option value="">Todos</option>
+                {% for year in schoolYear %}
+                    <option value="{{ year.idScholYear }}" {% if year.idScholYear == request.GET.anio %} selected {% endif %}>
+                        {{ year.nameYear }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+          <div class="col-md-2">
+            <label for="zona-filter" class="form-label">Zona:</label>
+            <select id="zona-filter" name="zona" class="form-select">
+              <option value="">Todas</option>
+              {% for zona in zones %}
+              <option value="{{ zona.zone }}" {% if zona.zone == request.GET.zona %} selected {% endif %}>{{ zona.zone }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="region-filter" class="form-label">Regiones:</label>
+            <select id="region-filter" name="region" class="form-select">
+              <option value="">Todas</option>
+              {% for region in regiones %}
+              <option value="{{ region.region }}"  {% if region.region == request.GET.region %} selected {% endif %}>{{ region.region }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="centro-filter" class="form-label">Centro:</label>
+            <select id="centro-filter" name="centro" class="form-select">
+              <option value="">Todos</option>
+              {% for center in centerSchool %}
+              <option value="{{ center.centerSchool }}"{% if center.centerSchool == request.GET.centro %} selected {% endif %}>{{ center.centerSchool }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="programa-filter" class="form-label">Programa:</label>
+            <select id="programa-filter" name="programa" class="form-select">
+              <option value="">Todos</option>
+              {% for program in programs %}
+              <option value="{{ program.program }}" {% if program.program == request.GET.programa %} selected {% endif %}>{{ program.program }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="student-type-filter" class="form-label">Tipo estudiante:</label>
+            <select id="student-type-filter" name="student_type" class="form-select">
+              <option value="">Todos</option>
+              {% for studentType in studentTypes %}
+              <option value="{{ studentType.studentType }}" {% if studentType.studentType == request.GET.student_type %} selected {% endif %}>{{ studentType.studentType }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="modality-filter" class="form-label">Modalidad:</label>
+            <select id="modality-filter" name="modality" class="form-select">
+              <option value="">Todas</option>
+              {% for modality in modalitys %}
+              <option value="{{ modality.modality }}" {% if modality.modality == request.GET.modality %} selected {% endif %}>{{ modality.modality }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+          </div>
+        </div>
+      </form>
+
+          {% if labels %}
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+              <canvas id="chart{{ forloop.counter }}" height="200hv"></canvas>
+            </div>
+
+            <script>
+              var labels = {{ labels| safe }};
+              var data = {{ data| safe }};
+              var ctx = document.getElementById('chart{{ forloop.counter }}').getContext('2d');
+              function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                  color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+              }
+
+              // Genera un color aleatorio para cada barra
+              var backgroundColors = data.map(function () {
+                return getRandomColor();
+              });
+              // console.log("data: ", title);
+              // var colors = generateRandomColors(data.length);
+              // console.log("data.map(value => value[0]", data[0]);
+              // var data = [{ x: 'Jan', net: 100, cogs: 50, gm: 50 }, { x: 'Feb', net: 120, cogs: 55, gm: 75 }];
+              var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    label: "Materias",  // Primera etiqueta
+                    data: data,  // Extrae el primer valor de cada conjunto de datos
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors,
+                    borderWidth: 1,
+
+
+                  }]
+
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    },
+
+                  },
+
+
+                }
+              });
+            </script>
+
+          </div>
+          {% endif %}
+          {% endblock%}
+        </div>
+        <!------------------------------------->
+
+      </div>
+
+    </div>
+
+
+  </div>
+  <!---------------------------->
+
+  <!-- --------------------- -->
+  {% block footer%}
+  <footer class="footer my-auto">
+    <div class="footer_container">
+      <div class="footer_top">
+        <div class="info_emp">
+          <h2 class="footer_logo">UTPL</h2>
+          <p class="description">Sistema de predicción de deserción estudiantil</p>
+
+          <span class="copyright">&copy; 2023 Andres</span>
+        </div>
+
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-facebook"></i>
+              </a>
+            </li>
+
+
+          </ul>
+        </div>
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-twitter"></i>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-instagram"></i>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+  {% endblock%}
+
+  <script src="{% static 'js/jquery-3.7.1.js'%}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/jquery.dataTables.min.js'%}"></script>
+  <script src="{% static 'js/dataTables.bootstrap5.min.js'%}"></script>
+  <script src="{% static 'js/table.js'%}"></script>
+  <script type="text/javascript"
+    src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <!-- Agrega esto en la sección <head> de tu HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+
+</html>

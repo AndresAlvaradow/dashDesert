@@ -1,0 +1,24 @@
+#descripcion{
+    resize: none;
+}
+
+.center{
+    text-align: center;
+    vertical-align: middle;
+    
+}
+body{
+    background: rgb(255, 255, 255);
+   
+}
+.sibar{
+    background: #DEEAF5 !important;
+}
+table {
+    font-size: 12px; /* Ajusta el tamaño del texto */
+}
+
+th, td {
+    padding: 8px; /* Ajusta el espacio interno de las celdas */
+    text-align: center; /* Centra el texto en las celdas */
+}

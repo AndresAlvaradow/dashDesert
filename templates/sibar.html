@@ -1,0 +1,59 @@
+{% load static %}
+<div class="col-auto col-md-1 col-xl-1 px-sm-1 px-0 bg-dark sibar">
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-dark min-vh-100">
+        <a href="#" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <span class="fs-5 d-none d-sm-inline ">UTPL</span>
+        </a>
+
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li class="nav-item ">
+                <a href="{%url 'dashboard:index'%}" class="nav-link align-middle px-0 text-dark">
+                    <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline "
+                        style="font-size: smaller;">Inicio</span>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a href="{%url 'dashboard:machine'%}" class="nav-link align-middle px-0 text-dark">
+                    <i class="fa-solid fa-gears"></i><span class="ms-1 d-none d-sm-inline "
+                        style="font-size: smaller;">Machine
+                        Learning</span>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a href="{%url 'dashboard:deep'%}" class="nav-link align-middle px-0 text-dark">
+                    <i class="fa-solid fa-network-wired"></i><span class="ms-1 d-none d-sm-inline "
+                        style="font-size: smaller;">Deep
+                        Learning</span>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a href="{%url 'dashboard:statistics_academic'%}" class="nav-link align-middle px-0 text-dark">
+                    <i class="fa-solid fa-square-poll-vertical"></i><span class="ms-1 d-none d-sm-inline "
+                        style="font-size: smaller;">Materias</span>
+                </a>
+            </li>
+            <!-- <li class="nav-item ">
+                <a href="{%url 'dashboard:index'%}" class="nav-link align-middle px-0 text-dark">
+                    <i class="fa-solid fa-table"></i><span class="ms-1 d-none d-sm-inline "
+                        style="font-size: smaller;">Tabla General</span>
+                </a>
+            </li> -->
+
+        </ul>
+        <hr>
+        <div class="dropdown pb-4">
+            <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+                id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+
+                <span class="d-none d-sm-inline mx-1"><i class="fa-solid fa-user"></i> User</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li><a class="dropdown-item" href="/admin">Administrador</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="{%url 'dashboard:logout'%}">Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

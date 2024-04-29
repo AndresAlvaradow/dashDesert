@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block title %}
+  <title>Dashboard</title>
+  {% endblock %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/styleb.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style_footer.css'%}">
+  <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap5.min.css'%}">
+  <link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+  <script src="https://kit.fontawesome.com/4ab2e2f761.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+    integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      {% block nav%}
+      {% include 'sibar.html'%}
+      {% endblock%}
+      <div class="col pt-3 p-0">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col text-center mt-3">
+              <a href="{% url 'dashboard:index' %}" class="btn btn-primary">Regresar a la Página de
+                Inicio</a>
+            </div>
+          </div>
+        </div>
+        <!-- contenido de la pagina-->
+        <div class="container my-3  min-vh-100">
+          {%block conted%}
+          <div>
+            <table class="table table-bordered table-striped  table-responsive" id="dataTable" width="100%"
+              cellspacing="0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Identificación</th>
+                  <th>Nombres</th>
+                  <th>Modalidad</th>
+                  <th>Ciclo</th>
+                  <th>Calificación</th>
+                  <th>Nombre del curso</th>
+                  <th>Programa</th>
+                  <th>Tipo</th>
+                  <th>Centro educativo</th>
+                  <th>Zona</th>
+                  <th>Region</th>
+                  <th>Año académico</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if DataStudent %}
+                {% for est in DataStudent %}
+                <tr>
+                  <td>{{ est.idDataStudent }}</td>
+                  <td>{{ est.identification }}</td>
+                  <td>{{ est.names }}</td>
+                  <td>{{ est.modality }}</td>
+                  <td>{{ est.cycle }}</td>
+                  <td>{{ est.qualification}}</td>
+                  <td>{{ est.courseName }}</td>
+                  <td>{{ est.program }}</td>
+                  <td>{{ est.studentType }}</td>
+                  <td>{{ est.centerSchool }}</td>
+                  <td>{{ est.zone }}</td>
+                  <td>{{ est.region }}</td>
+                  <td>{{ est.nameYear }}</td>
+
+                </tr>
+                {% endfor %}
+                {% else %}
+                <h1>no hay registro de data</h1>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+
+
+          <div class="row justify-content-center ">
+            <h3 style="text-align: center;">Gráfico estadistico del estudiante</h3>
+            {% for conjunto in dataGraf %}
+            <div class="col-sm-12 col-md-2 col-lg-6 col-xl-6 text-center">
+              <canvas id="chart2{{ forloop.counter }}" height="200hv"></canvas>
+            </div>
+
+            <script>
+              // Obtén los datos del contexto y configura el gráfico
+
+              var labels = {{ conjunto.labels| safe }};
+              var data = {{ conjunto.data| safe }};
+              var title = {{ conjunto.title| safe }};
+              var ctx = document.getElementById('chart2{{ forloop.counter }}').getContext('2d');
+
+              var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    label: labels[0],  // Primera etiqueta
+                    data: data,  // Extrae el primer valor de cada conjunto de datos
+                    backgroundColor: 'rgb(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    parsing: {
+                      yAxisKey: 'lstm'
+                    }
+
+                  }, {
+                    label: labels[1],  // Tercera etiqueta
+                    data: data,  // Extrae el tercer valor de cada conjunto de datos
+                    backgroundColor: 'rgb(255, 205, 86, 0.2)',
+                    borderColor: 'rgb(255, 205, 86, 1)',
+                    borderWidth: 1,
+                    parsing: {
+                      yAxisKey: 'cnn'
+                    }
+                  }],
+
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    },
+                    x: {
+                      stacked: false
+                    },
+
+                  },
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: title[0]
+                    },
+                    datalabels: {
+                      display: true,
+                      color: 'black',
+                      anchor: 'end',
+                      align: 'top',
+                      formatter: function (value, context) {
+                        return value; // Muestra el valor de cada barra
+                      }
+                    }
+                  }
+
+                },
+
+              });
+            </script>
+            {% endfor %}
+          </div>
+
+          <div class="row justify-content-center">
+            <h3 style="text-align: center;">Gráfico Estadístico Materias Críticas</h3>
+
+            {% if DataStudent %}
+
+
+            <div class="col-sm-12 col-md-2 col-lg-6 col-xl-6 text-center">
+              <canvas id="chart{{ forloop.counter }}" height="200"></canvas>
+            </div>
+
+            <script>
+              // Obtén los datos del contexto y configura el gráfico
+
+              var ctx = document.getElementById('chart{{ forloop.counter }}').getContext('2d');
+
+              var myChart = new Chart(ctx, {
+                type: 'line', // Cambia a gráfico de líneas
+                data: {
+                  labels: {{ DataSubjects.courseNames | safe }},
+              datasets: [{
+                label: "Materias críticas", // Usa el título para la etiqueta del dataset
+                data: {{ DataSubjects.qualifications | safe }}, // Datos de las notas
+                fill: false, // No rellenes el área bajo la línea
+                borderColor: 'rgb(75, 192, 192)', // Color de la línea
+                tension: 0.1 // Suavidad de la curva de la línea
+              }]
+                },
+
+              });
+            </script>
+            {% endif %}
+          </div>
+
+          {% endblock%}
+
+        </div>
+
+
+        <!------------------------------------->
+
+      </div>
+
+    </div>
+  </div>
+  <!---------------------------->
+
+  <!-- --------------------- -->
+  {% block footer%}
+  <footer class="footer my-auto">
+    <div class="footer_container">
+      <div class="footer_top">
+        <div class="info_emp">
+          <h2 class="footer_logo">UTPL</h2>
+          <p class="description">Sistema de predicción de deserción estudiantil</p>
+
+          <span class="copyright">&copy; 2023 Andres</span>
+        </div>
+
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-facebook"></i>
+              </a>
+            </li>
+
+
+          </ul>
+        </div>
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-twitter"></i>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+        <div class="cont_titulo_item">
+          <ul class="footer_list">
+
+            <li class="footer_item">
+              <a href="" class="footer_item_link">
+                <i class="fa-brands fa-instagram"></i>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+  {% endblock%}
+
+  <script src="{% static 'js/jquery-3.7.1.js'%}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/jquery.dataTables.min.js'%}"></script>
+  <script src="{% static 'js/dataTables.bootstrap5.min.js'%}"></script>
+  <script src="{% static 'js/table.js'%}"></script>
+  <script type="text/javascript"
+    src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <!-- Agrega esto en la sección <head> de tu HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+</body>
+
+</html>
